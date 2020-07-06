@@ -1,27 +1,35 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import qualified Application.Products as APP
+import qualified Application.Products as SERVICE
+import qualified Adapter.Http.Products as HTTP
 import qualified Adapter.Postgres.Config.PostgresConfig as DB
 import qualified Adapter.Postgres.Migration.PostgresMigration as M
-import qualified Adapter.Postgres.Products as ADA
-import qualified Adapter.Postgres.Util.PostgresUtil as U
+import qualified Adapter.Postgres.Products as REPO
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Maybe (fromJust, fromMaybe)
-import System.Environment (lookupEnv)
-
-import Data.Text (Text)
-import Servant
-import Adapter.Http.Products
 import Data.Proxy
 import Network.Wai (Application)
 import Network.Wai.Handler.Warp (run)
+import Servant
+import System.Environment (lookupEnv)
 
-proxy :: Proxy ProductApi
+main :: IO ()
+main = do
+  conf <- load
+  pool <- DB.create conf
+  dir <- lookupEnv "DB_MIGRATION_DIR"
+  migration <- M.migrate pool (fromMaybe "db/migrations" dir)
+  let f1 = SERVICE.findAll (REPO.findAll pool)
+      f2 = SERVICE.findById (REPO.findById pool)
+      f3 = SERVICE.create (REPO.create pool)
+      server = serve proxy $ HTTP.routes f1 f2 f3
+  run 8080 server
+  
+proxy :: Proxy HTTP.ProductRoute
 proxy = Proxy
 
-server :: Application
-server = serve proxy api
+--server :: Application
 
 load :: MonadIO m => m DB.PgConfig
 load = do
@@ -37,15 +45,3 @@ load = do
            DB.pass = fromMaybe "haskell" pass',
            DB.database = fromMaybe "haskell_db" name'
          }
-
-main :: IO ()
-main = do
-  conf <- load
-  pool <- DB.create conf
-  dir <- lookupEnv "DB_MIGRATION_DIR"
-  migration <- M.migrate pool (fromMaybe "db/migrations" dir)
-  all <- APP.findAll (ADA.findAll pool)
-  print all
---main = run 8080 server
-
-  

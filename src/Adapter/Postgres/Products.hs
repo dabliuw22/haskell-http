@@ -11,12 +11,12 @@ import qualified Database.PostgreSQL.Simple as PG
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToRow
 import Database.PostgreSQL.Simple.ToField (toField)
-import qualified Domain.Products as P
+import qualified Domain.Products as DOMAIN
 
 class (Monad m, Functor m) => ProductRepository m where
-  findById :: Pool PG.Connection -> Text -> m (Maybe P.Product)
-  findAll :: Pool PG.Connection -> m [P.Product]
-  create :: Pool PG.Connection -> P.Product -> m ()
+  findById :: Pool PG.Connection -> Text -> m (Maybe DOMAIN.Product)
+  findAll :: Pool PG.Connection -> m [DOMAIN.Product]
+  create :: Pool PG.Connection -> DOMAIN.Product -> m ()
 
 instance ProductRepository IO where
   findById pool id = do 
@@ -25,7 +25,7 @@ instance ProductRepository IO where
           Just value  -> return $ Just (to value)
           Nothing     -> return Nothing
   findAll pool = fmap (map to) (findAll' pool)
-  create pool product = pure ()
+  create pool product = create' pool product
 
 data ProductRow =
   ProductRow {
@@ -53,25 +53,25 @@ findAll' pool' = liftIO $ queryListWithoutParams pool' sql
     sql = "SELECT * FROM products"
     
 create' :: MonadIO m => Pool PG.Connection 
-  -> P.Product -> m ()
+  -> DOMAIN.Product -> m ()
 create' pool' product = do
   let row = from product
   liftIO $ command pool' sql (_id row , _name row, _stock row)
   where
-    sql = "INSERT INTO products(id, name, stock) VALUES (?, ?, ?)"
+    sql = "INSERT INTO products (id, name, stock) VALUES (?, ?, ?)"
 
-to :: ProductRow -> P.Product
+to :: ProductRow -> DOMAIN.Product
 to row = 
-  P.Product {
-    P.productId = P.ProductId (_id row),
-    P.productName = P.ProductName (_name row),
-    P.productStock = P.ProductStock (_stock row)
+  DOMAIN.Product {
+    DOMAIN.productId = DOMAIN.ProductId (_id row),
+    DOMAIN.productName = DOMAIN.ProductName (_name row),
+    DOMAIN.productStock = DOMAIN.ProductStock (_stock row)
   }
 
-from :: P.Product -> ProductRow
+from :: DOMAIN.Product -> ProductRow
 from p =
   ProductRow {
-    _id = P.id (P.productId p),
-    _name = P.name (P.productName p),
-    _stock = P.stock (P.productStock p)
+    _id = DOMAIN.id (DOMAIN.productId p),
+    _name = DOMAIN.name (DOMAIN.productName p),
+    _stock = DOMAIN.stock (DOMAIN.productStock p)
   }
