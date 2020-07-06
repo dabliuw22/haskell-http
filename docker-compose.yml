@@ -1,0 +1,11 @@
+version: "3"
+services:
+  db:
+    image: "postgres"
+    container_name: "my_haskell_postgres"
+    environment:
+      - POSTGRES_USER=haskell
+      - POSTGRES_PASSWORD=haskell
+      - POSTGRES_DB=haskell_db
+    ports:
+      - "5432:5432"
