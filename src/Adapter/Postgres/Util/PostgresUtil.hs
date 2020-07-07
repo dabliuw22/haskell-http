@@ -24,7 +24,7 @@ class PostgresUtil m where
 instance PostgresUtil IO where
   queryOne pool q b = queryOne' pool q b
   queryListWithoutParams pool q = queryListWithoutParams' pool q
-  queryList pool q b = queryList pool q b
+  queryList pool q b = queryList' pool q b
   command pool c = command' pool c
 
 queryOne' :: (MonadIO m, MonadThrow m, FromRow a, ToRow b)

@@ -43,7 +43,7 @@ instance ToRow ProductRow where
 
 findById' :: MonadIO m => Pool PG.Connection 
   -> Text -> m (Maybe ProductRow)
-findById' pool' id' = liftIO $ UTIL.queryOne pool' sql [id' :: Text] 
+findById' pool' id' = liftIO $ UTIL.queryOne pool' sql [id' :: Text]
   `catch` \e -> handlePgException e message
   where
     sql = "SELECT * FROM products WHERE id = ?"
