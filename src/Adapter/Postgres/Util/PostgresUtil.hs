@@ -1,19 +1,23 @@
-module Adapter.Postgres.Util.PostgresUtil (PostgresUtil(..)) where
+{-# LANGUAGE FlexibleContexts #-}
+module Adapter.Postgres.Util.PostgresUtil (PostgresUtil(..), PostgresException) where
 
+import Control.Exception (Exception, catch)
+import Control.Monad.Catch (MonadThrow, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Pool
+import Data.Typeable
 import qualified Database.PostgreSQL.Simple as PG
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToRow
 
 class PostgresUtil m where
-  queryOne :: (FromRow a, ToRow b) => Pool PG.Connection 
+  queryOne :: (FromRow a, ToRow b) => Pool PG.Connection
     -> PG.Query -> b -> m (Maybe a)
-  queryListWithoutParams :: FromRow a => Pool PG.Connection 
+  queryListWithoutParams :: FromRow a => Pool PG.Connection
     -> PG.Query -> m [a]
-  queryList :: (FromRow a, ToRow b) => Pool PG.Connection 
+  queryList :: (FromRow a, ToRow b) => Pool PG.Connection
     -> PG.Query -> b -> m [a]
-  command :: ToRow b => Pool PG.Connection -> PG.Query 
+  command :: ToRow b => Pool PG.Connection -> PG.Query
     -> b -> m ()
 
 instance PostgresUtil IO where
@@ -22,23 +26,39 @@ instance PostgresUtil IO where
   queryList pool q b = queryList pool q b
   command pool c = command' pool c
 
-queryOne' :: (MonadIO m, FromRow a, ToRow b) => Pool PG.Connection 
+queryOne' :: (MonadIO m, MonadThrow m, FromRow a, ToRow b)
+  => Pool PG.Connection
   -> PG.Query -> b -> m (Maybe a)
 queryOne' p' q' b = do
   result <- liftIO $ withResource p' (\conn -> PG.query conn q' b)
+    `catch` handleSqlError
   case result of
         (h: _) -> return $ Just h
         _      -> return Nothing
 
-queryList' :: (MonadIO m, FromRow a, ToRow b) => Pool PG.Connection 
+queryList' :: (MonadIO m, MonadThrow m, FromRow a, ToRow b)
+  => Pool PG.Connection
   -> PG.Query -> b -> m [a]
 queryList' p' q' b = liftIO $ withResource p' (\conn -> PG.query conn q' b)
+  `catch` handleSqlError
 
-queryListWithoutParams' :: (MonadIO m, FromRow a) => Pool PG.Connection 
+queryListWithoutParams' :: (MonadIO m, MonadThrow m, FromRow a)
+  => Pool PG.Connection
   -> PG.Query -> m [a]
 queryListWithoutParams' p' q' = liftIO $ withResource p' (`PG.query_` q')
+  `catch` handleSqlError
 
-command' :: (MonadIO m, ToRow b) =>  Pool PG.Connection 
+command' :: (MonadIO m, MonadThrow m, ToRow b)
+  => Pool PG.Connection
   -> PG.Query -> b -> m ()
-command' p' q' b = liftIO $ withResource p' (\conn -> PG.execute conn q' b) 
-  >>= (\r -> return ())
+command' p' q' b = do
+  result <- liftIO $ withResource p' (\conn -> PG.execute conn q' b)
+    `catch` handleSqlError
+  return ()
+
+handleSqlError :: (MonadIO m, MonadThrow m) => PG.SqlError -> m a
+handleSqlError e @ (PG.SqlError _ _ m _ _) = throwM $ PostgresException (show e)                   
+
+newtype PostgresException = PostgresException String deriving (Show, Typeable)
+
+instance Exception PostgresException

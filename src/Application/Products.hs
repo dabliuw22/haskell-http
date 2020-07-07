@@ -1,13 +1,11 @@
 module Application.Products (ProductService(..)) where
 
-import Control.Monad.Catch
-import Control.Monad.Except
 import Control.Monad.IO.Class
 import Data.Text (Text)
 import qualified Domain.Products as DOMAIN
 
 class (Monad m, Functor m) => ProductService m where
-  findById :: (Text -> m (Maybe DOMAIN.Product)) 
+  findById :: (Text -> m (Maybe DOMAIN.Product))
     -> Text -> m (Maybe DOMAIN.Product)
   findAll :: m [DOMAIN.Product] -> m [DOMAIN.Product]
   create :: (DOMAIN.Product -> m ()) -> DOMAIN.Product -> m ()
@@ -17,18 +15,15 @@ instance ProductService IO where
   findAll f = findAll' f
   create f product = create' f product
 
-findById' :: (Functor m, Monad m, MonadError e m, MonadThrow m)
-  => (Text -> m (Maybe DOMAIN.Product)) 
+findById' :: (Functor m, Monad m)
+  => (Text -> m (Maybe DOMAIN.Product))
   -> Text -> m (Maybe DOMAIN.Product)
-findById' f' id' = f' id' `catchError` 
-  \e -> throwM $ DOMAIN.ProductException "Error findById"
+findById' f' = f'
 
-findAll' :: (Functor m, Monad m, MonadError e m, MonadThrow m)
+findAll' :: (Functor m, Monad m)
   => m [DOMAIN.Product] -> m [DOMAIN.Product]
-findAll' f' = f' `catchError` 
-  \e -> throwM $ DOMAIN.ProductException "Error findAll"
+findAll' f' = f'
 
-create' :: (Functor m, Monad m, MonadError e m, MonadThrow m)
+create' :: (Functor m, Monad m)
   => (DOMAIN.Product -> m ()) -> DOMAIN.Product -> m ()
-create' f' product' = f' product' `catchError` 
-  \e -> throwM $ DOMAIN.ProductException "Error create"
+create' f' = f'
