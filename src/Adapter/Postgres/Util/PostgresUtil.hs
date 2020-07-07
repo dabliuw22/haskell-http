@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 module Adapter.Postgres.Util.PostgresUtil (PostgresUtil(..), PostgresException) where
 
 import Control.Exception (Exception, catch)

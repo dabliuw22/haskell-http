@@ -10,7 +10,7 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Aeson
 import Data.Text (Text)
 import qualified Domain.Products as DOMAIN
-import GHC.Generics
+import GHC.Generics (Generic)
 import Servant
 
 type ProductRoute =
@@ -39,18 +39,18 @@ oneProduct :: (Text -> IO (Maybe DOMAIN.Product)) -> Text -> Handler (Maybe Prod
 oneProduct f' id' = do
   result <- liftIO $ f' id'
   case result of
-        Just value -> return $ Just (toDto value)
+        Just value -> return $ Just (to value)
         Nothing    -> throwError 
           err404 {
             errBody = "Not Found Product"
           }
 
 allProducts :: IO [DOMAIN.Product] -> Handler [ProductDto]
-allProducts f' = liftIO $ fmap (map toDto) f'
+allProducts f' = liftIO $ fmap (map to) f'
 
 createProduct :: (DOMAIN.Product -> IO ()) -> ProductDto -> Handler ()
 createProduct f' dto' = do 
-  result <- liftIO $ try (f' (fromDto dto'))
+  result <- liftIO $ try (f' (from dto'))
   case result of
         Right v -> return v
         Left e  -> case e of
@@ -63,16 +63,16 @@ createProduct f' dto' = do
                             errBody = "Error Create Product"
                           }
 
-toDto :: DOMAIN.Product -> ProductDto
-toDto p =
+to :: DOMAIN.Product -> ProductDto
+to p =
   ProductDto {
     product_id = DOMAIN.id (DOMAIN.productId p),
     product_name = DOMAIN.name (DOMAIN.productName p),
     product_stock = DOMAIN.stock (DOMAIN.productStock p)
   }
 
-fromDto :: ProductDto -> DOMAIN.Product
-fromDto dto =
+from :: ProductDto -> DOMAIN.Product
+from dto =
   DOMAIN.Product {
     DOMAIN.productId = DOMAIN.ProductId (product_id dto),
     DOMAIN.productName = DOMAIN.ProductName (product_name dto),
