@@ -66,10 +66,6 @@ createProduct f' dto' = do
                           err400 { 
                             errBody = "Error Create Product" 
                           }
-                        _ -> throwError 
-                          err500 {
-                            errBody = "Error Create Product"
-                          }
 
 to :: DOMAIN.Product -> ProductDto
 to p =

@@ -17,7 +17,7 @@ import qualified Domain.Products as DOMAIN
 class (Monad m, Functor m) => ProductRepository m where
   findById :: Pool PG.Connection -> Text -> m (Maybe DOMAIN.Product)
   findAll :: Pool PG.Connection -> m [DOMAIN.Product]
-  create :: Pool PG.Connection -> DOMAIN.Product -> m ()
+  create :: Pool PG.Connection -> DOMAIN.Product -> m Bool
 
 instance ProductRepository IO where
   findById pool id = do 
@@ -56,7 +56,7 @@ findAll' pool' = liftIO $ UTIL.queryListWithoutParams pool' sql
     sql = "SELECT * FROM products"
     
 create' :: MonadIO m => Pool PG.Connection 
-  -> DOMAIN.Product -> m ()
+  -> DOMAIN.Product -> m Bool
 create' pool' product = do
   let row = from product
   liftIO $ UTIL.command pool' sql (_id row , _name row, _stock row)
