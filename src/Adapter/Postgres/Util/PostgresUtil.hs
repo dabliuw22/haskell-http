@@ -57,9 +57,9 @@ command' p' q' b = do
     `catch` handleSqlError
   return ()
 
-handleSqlError :: (MonadIO m, MonadThrow m) => PG.SqlError -> m a
-handleSqlError e @ (PG.SqlError _ _ m _ _) = throwM $ PostgresException (show e)                   
-
 newtype PostgresException = PostgresException String deriving (Show, Typeable)
 
 instance Exception PostgresException
+
+handleSqlError :: (MonadIO m, MonadThrow m) => PG.SqlError -> m a
+handleSqlError e @ (PG.SqlError _ _ m _ _) = throwM $ PostgresException (show e)

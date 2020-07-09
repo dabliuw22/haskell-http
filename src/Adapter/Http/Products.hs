@@ -15,7 +15,7 @@ import Servant
 
 type ProductRoute =
   "products" :> Get '[JSON] [ProductDto] :<|>
-  "products" :> Capture "id" Text :> Get '[JSON] (Maybe ProductDto) :<|>
+  "products" :> Capture "id" Text :> Get '[JSON] ProductDto :<|>
   "products" :> ReqBody '[JSON] ProductDto :> PostCreated '[JSON] ()
 
 data ProductDto =
@@ -35,18 +35,26 @@ routes :: IO [DOMAIN.Product]
   -> Server ProductRoute
 routes f1 f2 f3 = allProducts f1 :<|> oneProduct f2 :<|> createProduct f3
 
-oneProduct :: (Text -> IO (Maybe DOMAIN.Product)) -> Text -> Handler (Maybe ProductDto)
+oneProduct :: (Text -> IO (Maybe DOMAIN.Product)) -> Text -> Handler ProductDto
 oneProduct f' id' = do
   result <- liftIO $ f' id'
   case result of
-        Just value -> return $ Just (to value)
+        Just value -> return $ to value
         Nothing    -> throwError 
           err404 {
             errBody = "Not Found Product"
           }
 
 allProducts :: IO [DOMAIN.Product] -> Handler [ProductDto]
-allProducts f' = liftIO $ fmap (map to) f'
+allProducts f' = do 
+  result <- liftIO $ try (fmap (map to) f')
+  case result of
+          Right v -> return v
+          Left e  -> case e of
+                          DOMAIN.ProductException s -> throwError 
+                            err500 {
+                              errBody = "Error Get All Products"
+                            }
 
 createProduct :: (DOMAIN.Product -> IO ()) -> ProductDto -> Handler ()
 createProduct f' dto' = do 

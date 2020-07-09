@@ -44,31 +44,28 @@ instance ToRow ProductRow where
 findById' :: MonadIO m => Pool PG.Connection 
   -> Text -> m (Maybe ProductRow)
 findById' pool' id' = liftIO $ UTIL.queryOne pool' sql [id' :: Text]
-  `catch` \e -> handlePgException e message
+  `catch` \e -> handlePgException e
   where
     sql = "SELECT * FROM products WHERE id = ?"
-    message = "Error findById"
 
 findAll' :: MonadIO m => Pool PG.Connection 
   -> m [ProductRow]
 findAll' pool' = liftIO $ UTIL.queryListWithoutParams pool' sql 
-  `catch` \e -> handlePgException e message
+  `catch` \e -> handlePgException e
   where 
     sql = "SELECT * FROM products"
-    message = "Error findAll"
     
 create' :: MonadIO m => Pool PG.Connection 
   -> DOMAIN.Product -> m ()
 create' pool' product = do
   let row = from product
   liftIO $ UTIL.command pool' sql (_id row , _name row, _stock row)
-    `catch` \e -> handlePgException e message
+    `catch` \e -> handlePgException e
   where
     sql = "INSERT INTO products (id, name, stock) VALUES (?, ?, ?)"
-    message = "Error create"
 
-handlePgException :: (MonadIO m, MonadThrow m) => UTIL.PostgresException -> String -> m a
-handlePgException e m = throwM $ DOMAIN.ProductException m
+handlePgException :: (MonadIO m, MonadThrow m) => UTIL.PostgresException -> m a
+handlePgException (UTIL.PostgresException em) = throwM $ DOMAIN.ProductException em
 
 to :: ProductRow -> DOMAIN.Product
 to row = 
