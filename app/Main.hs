@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 module Main where
 
 import qualified Application.Products as SERVICE
@@ -6,13 +7,14 @@ import qualified Adapter.Http.Products as HTTP
 import qualified Adapter.Postgres.Config.PostgresConfig as DB
 import qualified Adapter.Postgres.Migration.PostgresMigration as M
 import qualified Adapter.Postgres.Products as REPO
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromMaybe)
 import Data.Proxy
 import Network.Wai (Application)
 import Network.Wai.Handler.Warp (run)
 import Servant
 import System.Environment (lookupEnv)
+import Katip
+import Adapter.Katip.Logger (logger)
 
 main :: IO ()
 main = do
@@ -23,6 +25,9 @@ main = do
       f2 = SERVICE.findById (REPO.findById pool)
       f3 = SERVICE.create (REPO.create pool)
       server = serve proxy $ HTTP.routes f1 f2 f3
+  logger $ \logEnv -> do
+    runKatipContextT logEnv () "server-start" $ do
+      $(logTM) InfoS "Start Server..."
   run 8080 server
   
 proxy :: Proxy HTTP.ProductRoute

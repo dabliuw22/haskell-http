@@ -1,5 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Adapter.Postgres.Products (ProductRepository(..)) where
 
 import qualified Adapter.Postgres.Util.PostgresUtil as UTIL

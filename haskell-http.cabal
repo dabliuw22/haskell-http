@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Adapter.Http.Products
+      Adapter.Katip.Logger
       Adapter.Postgres.Config.PostgresConfig
       Adapter.Postgres.Migration.PostgresMigration
       Adapter.Postgres.Products
