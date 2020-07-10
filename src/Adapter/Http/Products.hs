@@ -14,9 +14,16 @@ import GHC.Generics (Generic)
 import Servant
 
 type ProductRoute =
+  "products" :> (
+    Get '[JSON] [ProductDto] :<|>
+    Capture "id" Text :> Get '[JSON] ProductDto :<|>
+    ReqBody '[JSON] ProductDto :> PostCreated '[JSON] ()
+  ) -- or 
+  {-
   "products" :> Get '[JSON] [ProductDto] :<|>
   "products" :> Capture "id" Text :> Get '[JSON] ProductDto :<|>
   "products" :> ReqBody '[JSON] ProductDto :> PostCreated '[JSON] ()
+  -}
 
 data ProductDto =
   ProductDto {
@@ -49,12 +56,12 @@ allProducts :: IO [DOMAIN.Product] -> Handler [ProductDto]
 allProducts f' = do 
   result <- liftIO $ try (fmap (map to) f')
   case result of
-          Right v -> return v
-          Left e  -> case e of
-                          DOMAIN.ProductException s -> throwError 
-                            err500 {
-                              errBody = "Error Get All Products"
-                            }
+        Right v -> return v
+        Left e  -> case e of
+                        DOMAIN.ProductException s -> throwError 
+                          err500 {
+                            errBody = "Error Get All Products"
+                          }
 
 createProduct :: (DOMAIN.Product -> IO ()) -> ProductDto -> Handler ()
 createProduct f' dto' = do 
