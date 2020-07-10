@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Adapter.Effect.AsyncTask
       Adapter.Http.Products
       Adapter.Katip.Logger
       Adapter.Postgres.Config.PostgresConfig

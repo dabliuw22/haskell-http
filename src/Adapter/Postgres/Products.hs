@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Adapter.Postgres.Products (ProductRepository(..)) where
 
+import qualified Adapter.Effect.AsyncTask as ASYNC
 import qualified Adapter.Postgres.Util.PostgresUtil as UTIL
 import Control.Exception (catch)
 import Control.Monad.Catch (MonadThrow, throwM)
@@ -21,12 +22,12 @@ class (Monad m, Functor m) => ProductRepository m where
 
 instance ProductRepository IO where
   findById pool id = do 
-    result <- findById' pool id
+    result <- ASYNC.run $ findById' pool id
     case result of
           Just value  -> return $ Just (to value)
           Nothing     -> return Nothing
-  findAll pool = fmap (map to) (findAll' pool)
-  create pool product = create' pool product
+  findAll pool = ASYNC.run $ fmap (map to) (findAll' pool)
+  create pool product = ASYNC.run $ create' pool product
 
 data ProductRow =
   ProductRow {
