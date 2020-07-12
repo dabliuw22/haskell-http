@@ -14,4 +14,6 @@ logger action = do
     makeLogEnv = do
       logEnv <- initLogEnv "haskell-http" "env"
       stdoutScribe <- mkHandleScribe ColorIfTerminal stdout (permitItem InfoS) V2
-      registerScribe "stdout" stdoutScribe defaultScribeSettings logEnv
+      fileScribe <- mkFileScribe "logs/log.log" (permitItem InfoS) V2
+      newLogEnv <- registerScribe "stdout" stdoutScribe defaultScribeSettings logEnv 
+      registerScribe "file" fileScribe defaultScribeSettings newLogEnv
