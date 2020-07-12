@@ -3,7 +3,7 @@
 cabal.project.local
 dist-newstyle/
 dist/
-logs/log.log
+logs/
 .ghc.*
 .direnv
 .idea/
