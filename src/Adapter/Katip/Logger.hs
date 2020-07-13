@@ -1,9 +1,9 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Adapter.Katip.Logger (logger) where
 
 import Control.Exception (bracket)
 import Control.Monad.IO.Class (MonadIO, liftIO)
+import Data.Maybe (fromMaybe)
 import Katip
 import System.IO (stdout)
 import System.Directory (createDirectoryIfMissing)
@@ -16,12 +16,10 @@ logger action = do
     logFilename = "haskell-http.log"
     makeLogEnv = do
       logEnv <- initLogEnv "haskell-http" "env"
-      logsDir <- lookupEnv "LOGS_DIR" 
-        >>= \case
-              Just p  -> return p
-              Nothing -> return "logs"
-      let file = logsDir ++ "/" ++ logFilename
-      dirCreated <- createDirectoryIfMissing True logsDir
+      logsDirEnv <- lookupEnv "LOGS_DIR"
+      let dir = fromMaybe "logs" logsDirEnv
+          file = dir ++ "/" ++ logFilename
+      dirCreated <- createDirectoryIfMissing True dir
       stdoutScribe <- mkHandleScribe ColorIfTerminal stdout (permitItem InfoS) V2
       fileScribe <- mkFileScribe file (permitItem InfoS) V2
       newLogEnv <- registerScribe "stdout" stdoutScribe defaultScribeSettings logEnv
