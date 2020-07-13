@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 module Main where
@@ -20,19 +21,19 @@ main :: IO ()
 main = do
   pool <- DB.create
   dir <- lookupEnv "DB_MIGRATION_DIR"
-  port' <- lookupEnv "APP_PORT"
+  port' <- lookupEnv "APP_PORT" 
+    >>= \case
+          Just p  -> return (read p :: Int)
+          Nothing -> return 8080
   migration <- M.migrate pool (fromMaybe "db/migrations" dir)
-  let port = case port' of
-        Just p  -> read p :: Int
-        Nothing -> 8080
-      f1 = SERVICE.findAll (REPO.findAll pool)
+  let f1 = SERVICE.findAll (REPO.findAll pool)
       f2 = SERVICE.findById (REPO.findById pool)
       f3 = SERVICE.create (REPO.create pool)
       server = serve proxy $ HTTP.routes f1 f2 f3
   logger $ \logEnv -> do
     runKatipContextT logEnv () "server-start" $ do
       $(logTM) InfoS "Start Server..."
-  run port server
+  run port' server
   
 proxy :: Proxy HTTP.ProductRoute
 proxy = Proxy
