@@ -24,7 +24,7 @@ migrate pool dir = do
       throwM MigrationException
     _                  -> return ()
   where
-    commands = [M.MigrationInitialization, M.MigrationValidation (M.MigrationDirectory dir)]
+    commands = [M.MigrationInitialization, M.MigrationDirectory dir]
     namespace = "migrations"
     
 data MigrationException = MigrationException deriving (Show, Typeable)
