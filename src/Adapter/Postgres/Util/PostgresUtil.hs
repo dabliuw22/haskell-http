@@ -107,5 +107,5 @@ handleSqlError :: (MonadIO m, MonadThrow m) => PG.SqlError -> Namespace -> m a
 handleSqlError e @ (PG.SqlError _ _ m _ _) namespace = do
   liftIO $ logger $ \logEnv -> do
     runKatipContextT logEnv () namespace $ do
-      $(logTM) ErrorS $ "Error..."
+      $(logTM) ErrorS $ logStr ("SQL Error: " ++ show e)
   throwM $ PostgresException (show e)
