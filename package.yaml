@@ -41,6 +41,7 @@ dependencies:
 - wai-cors
 - warp
 - directory
+- time
 
 default-extensions:
 - TemplateHaskell
