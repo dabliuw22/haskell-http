@@ -42,6 +42,9 @@ queryOne' p' q' b = do
       $(logTM) InfoS $ "Query One Start..."
   result <- liftIO $ withResource p' (\conn -> PG.query conn q' b)
     `catch` \e -> handleSqlError e namespace
+    `catch` \e -> handleResultError e namespace
+    `catch` \e -> handleFormatError e namespace
+    `catch` \e -> handleQueryError e namespace
   liftIO $ logger $ \logEnv -> do
     runKatipContextT logEnv () namespace $ do
       $(logTM) InfoS $ "Query One End..."
@@ -60,6 +63,9 @@ queryList' p' q' b = do
       $(logTM) InfoS $ "Query List Start..."
   result <- liftIO $ withResource p' (\conn -> PG.query conn q' b)
     `catch` \e -> handleSqlError e namespace
+    `catch` \e -> handleResultError e namespace
+    `catch` \e -> handleFormatError e namespace
+    `catch` \e -> handleQueryError e namespace
   liftIO $ logger $ \logEnv -> do
     runKatipContextT logEnv () namespace $ do
       $(logTM) InfoS $ "Query List End..."
@@ -76,6 +82,9 @@ queryListWithoutParams' p' q' = do
       $(logTM) InfoS $ "Query List Without Params Start..."
   result <- liftIO $ withResource p' (`PG.query_` q') 
     `catch` \e -> handleSqlError e namespace
+    `catch` \e -> handleResultError e namespace
+    `catch` \e -> handleFormatError e namespace
+    `catch` \e -> handleQueryError e namespace
   liftIO $ logger $ \logEnv -> do
     runKatipContextT logEnv () namespace $ do
       $(logTM) InfoS $ "Query List Without Params End..."
@@ -92,6 +101,7 @@ command' p' q' b = do
       $(logTM) InfoS $ "Command Start..."
   result <- liftIO $ withResource p' (\conn -> PG.execute conn q' b)
     `catch` \e -> handleSqlError e namespace
+    `catch` \e -> handleFormatError e namespace
   liftIO $ logger $ \logEnv -> do
     runKatipContextT logEnv () namespace $ do
       $(logTM) InfoS $ "Command End..."
@@ -109,3 +119,27 @@ handleSqlError e @ (PG.SqlError _ _ m _ _) namespace = do
     runKatipContextT logEnv () namespace $ do
       $(logTM) ErrorS $ logStr ("SQL Error: " ++ show e)
   throwM $ PostgresException (show e)
+
+handleResultError :: (MonadIO m, MonadThrow m) => PG.ResultError -> Namespace -> m a
+handleResultError e namespace = do
+  liftIO $ logger $ \logEnv -> do
+      runKatipContextT logEnv () namespace $ do
+        $(logTM) ErrorS $ logStr ("SQL Result Error: " ++ show e)
+  case e of
+    PG.Incompatible _ _ _ _ m     -> throwM $ PostgresException m
+    PG.UnexpectedNull _ _ _ _ m   -> throwM $ PostgresException m
+    PG.ConversionFailed _ _ _ _ m -> throwM $ PostgresException m
+    
+handleFormatError :: (MonadIO m, MonadThrow m) => PG.FormatError -> Namespace -> m a
+handleFormatError e namespace = do
+  liftIO $ logger $ \logEnv -> do
+      runKatipContextT logEnv () namespace $ do
+        $(logTM) ErrorS $ logStr ("SQL Format Error: " ++ show e)
+  throwM $ PostgresException (show e)
+  
+handleQueryError :: (MonadIO m, MonadThrow m) => PG.QueryError -> Namespace -> m a
+handleQueryError e namespace = do
+   liftIO $ logger $ \logEnv -> do
+       runKatipContextT logEnv () namespace $ do
+         $(logTM) ErrorS $ logStr ("SQL Query Error: " ++ show e)
+   throwM $ PostgresException (show e)
