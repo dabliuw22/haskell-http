@@ -4,6 +4,7 @@ module Adapter.Katip.Logger (logger) where
 import Control.Exception (bracket)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Maybe (fromMaybe)
+import Data.String (fromString)
 import Katip
 import System.IO (stdout)
 import System.Directory (createDirectoryIfMissing)
@@ -15,7 +16,10 @@ logger action = do
   where
     logFilename = "haskell-http.log"
     makeLogEnv = do
-      logEnv <- initLogEnv "haskell-http" "env"
+      appName <- lookupEnv "APP_NAME"
+      env <- lookupEnv "APP_ENV"
+      logEnv <- initLogEnv (fromString $ fromMaybe "haskell-http" appName) 
+        (fromString $ fromMaybe "local" env)
       logsDirEnv <- lookupEnv "LOGS_DIR"
       let dir = fromMaybe "logs" logsDirEnv
           file = dir ++ "/" ++ logFilename
