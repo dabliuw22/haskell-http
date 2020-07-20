@@ -55,11 +55,12 @@ allProducts f' =  do
   result <- liftIO $ try (fmap (map to) f')
   case result of
         Right v -> return v
-        Left e  -> case e of
-                        DOMAIN.ProductException s -> throwError 
-                          err500 {
-                            errBody = "Error Get All Products"
-                          }
+        Left e  -> 
+          case e of
+            DOMAIN.ProductException s -> throwError
+              err500 {
+                errBody = "Error Get All Products"
+              }
 
 to :: DOMAIN.Product -> GetProductDto
 to p =
