@@ -39,11 +39,12 @@ createProduct f' dto' = do
   result <- liftIO $ try (f' (from dto' uuid' createdAt))
   case result of
       Right v -> return v
-      Left e  -> case e of
-                      DOMAIN.ProductException s -> throwError 
-                        err400 { 
-                          errBody = "Error Create Product" 
-                        }
+      Left e  -> 
+        case e of
+          DOMAIN.ProductException s -> throwError 
+            err400 {
+              errBody = "Error Create Product"
+            }
                         
 from :: CreateProductDto -> Text -> ZonedTime -> DOMAIN.Product
 from dto uuid createdAt =
