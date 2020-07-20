@@ -8,33 +8,45 @@ import Application.Products
 import Control.Exception (try)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Aeson
-import Data.Text (Text)
+import Data.Text (Text, pack)
+import Data.Time (ZonedTime, getZonedTime)
+import Data.UUID.V1 (nextUUID)
+import qualified Data.UUID as UUID
 import qualified Domain.Products as DOMAIN
 import GHC.Generics (Generic)
 import Servant
+import Data.Maybe (fromJust)
 
 type ProductRoute =
   "products" :> (
-    Get '[JSON] [ProductDto] :<|>
-    Capture "id" Text :> Get '[JSON] ProductDto :<|>
-    ReqBody '[JSON] ProductDto :> PostCreated '[JSON] ()
+    Get '[JSON] [GetProductDto] :<|>
+    Capture "id" Text :> Get '[JSON] GetProductDto :<|>
+    ReqBody '[JSON] CreateProductDto :> PostCreated '[JSON] ()
   ) -- or 
   {-
-  "products" :> Get '[JSON] [ProductDto] :<|>
-  "products" :> Capture "id" Text :> Get '[JSON] ProductDto :<|>
-  "products" :> ReqBody '[JSON] ProductDto :> PostCreated '[JSON] ()
+  "products" :> Get '[JSON] [GetProductDto] :<|>
+  "products" :> Capture "id" Text :> Get '[JSON] GetProductDto :<|>
+  "products" :> ReqBody '[JSON] CreateProductDto :> PostCreated '[JSON] ()
   -}
 
-data ProductDto =
-  ProductDto {
+
+data CreateProductDto =
+  CreateProductDto {
+    name :: Text,
+    stock :: Double
+  } deriving (Generic, Show)
+  
+data GetProductDto = 
+  GetProductDto {
     product_id:: Text,
     product_name :: Text,
-    product_stock :: Double
+    product_stock :: Double,
+    product_created_at :: ZonedTime
   } deriving (Generic, Show)
 
-instance ToJSON ProductDto
+instance ToJSON GetProductDto
 
-instance FromJSON ProductDto
+instance FromJSON CreateProductDto
 
 routes :: IO [DOMAIN.Product]
   -> (Text -> IO (Maybe DOMAIN.Product))
@@ -42,7 +54,7 @@ routes :: IO [DOMAIN.Product]
   -> Server ProductRoute
 routes f1 f2 f3 = allProducts f1 :<|> oneProduct f2 :<|> createProduct f3
 
-oneProduct :: (Text -> IO (Maybe DOMAIN.Product)) -> Text -> Handler ProductDto
+oneProduct :: (Text -> IO (Maybe DOMAIN.Product)) -> Text -> Handler GetProductDto
 oneProduct f' id' = do
   result <- liftIO $ f' id'
   case result of
@@ -52,8 +64,8 @@ oneProduct f' id' = do
             errBody = "Not Found Product"
           }
 
-allProducts :: IO [DOMAIN.Product] -> Handler [ProductDto]
-allProducts f' = do 
+allProducts :: IO [DOMAIN.Product] -> Handler [GetProductDto]
+allProducts f' =  do 
   result <- liftIO $ try (fmap (map to) f')
   case result of
         Right v -> return v
@@ -63,29 +75,34 @@ allProducts f' = do
                             errBody = "Error Get All Products"
                           }
 
-createProduct :: (DOMAIN.Product -> IO ()) -> ProductDto -> Handler ()
-createProduct f' dto' = do 
-  result <- liftIO $ try (f' (from dto'))
+createProduct :: (DOMAIN.Product -> IO ()) -> CreateProductDto -> Handler ()
+createProduct f' dto' = do
+  uuid <- liftIO nextUUID
+  let uuid' = pack (UUID.toString (fromJust uuid))
+  createdAt <- liftIO getZonedTime
+  result <- liftIO $ try (f' (from dto' uuid' createdAt))
   case result of
-        Right v -> return v
-        Left e  -> case e of
-                        DOMAIN.ProductException s -> throwError 
-                          err400 { 
-                            errBody = "Error Create Product" 
-                          }
+      Right v -> return v
+      Left e  -> case e of
+                      DOMAIN.ProductException s -> throwError 
+                        err400 { 
+                          errBody = "Error Create Product" 
+                        }
 
-to :: DOMAIN.Product -> ProductDto
+to :: DOMAIN.Product -> GetProductDto
 to p =
-  ProductDto {
+  GetProductDto {
     product_id = DOMAIN.id (DOMAIN.productId p),
     product_name = DOMAIN.name (DOMAIN.productName p),
-    product_stock = DOMAIN.stock (DOMAIN.productStock p)
+    product_stock = DOMAIN.stock (DOMAIN.productStock p),
+    product_created_at = DOMAIN.createdAt (DOMAIN.productCreatedAt p)
   }
 
-from :: ProductDto -> DOMAIN.Product
-from dto =
+from :: CreateProductDto -> Text -> ZonedTime -> DOMAIN.Product
+from dto uuid createdAt =
   DOMAIN.Product {
-    DOMAIN.productId = DOMAIN.ProductId (product_id dto),
-    DOMAIN.productName = DOMAIN.ProductName (product_name dto),
-    DOMAIN.productStock = DOMAIN.ProductStock (product_stock dto)
+    DOMAIN.productId = DOMAIN.ProductId uuid,
+    DOMAIN.productName = DOMAIN.ProductName (name dto),
+    DOMAIN.productStock = DOMAIN.ProductStock (stock dto),
+    DOMAIN.productCreatedAt = DOMAIN.ProductCreatedAt createdAt
   }
