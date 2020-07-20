@@ -1,5 +1,7 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
 module Adapter.Postgres.Products (ProductRepository(..)) where
 
 import qualified Adapter.Effect.AsyncTask as ASYNC
@@ -16,17 +18,17 @@ import Database.PostgreSQL.Simple.ToRow
 import Database.PostgreSQL.Simple.ToField (toField)
 import qualified Domain.Products as DOMAIN
 
-class (Monad m, Functor m) => ProductRepository m where
-  findById :: Pool PG.Connection -> Text -> m (Maybe DOMAIN.Product)
-  findAll :: Pool PG.Connection -> m [DOMAIN.Product]
-  create :: Pool PG.Connection -> DOMAIN.Product -> m Bool
+class (Monad m, Functor m) => ProductRepository m c where
+  findById :: c -> Text -> m (Maybe DOMAIN.Product)
+  findAll :: c -> m [DOMAIN.Product]
+  create :: c -> DOMAIN.Product -> m Bool
 
-instance ProductRepository IO where
+instance ProductRepository IO (Pool PG.Connection) where
   findById pool id = do 
     result <- ASYNC.run $ findById' pool id
     case result of
-          Just value  -> return $ Just (to value)
-          Nothing     -> return Nothing
+          Just value -> return $ Just (to value)
+          Nothing    -> return Nothing
   findAll pool = ASYNC.run $ fmap (map to) (findAll' pool)
   create pool product = ASYNC.run $ create' pool product
 
