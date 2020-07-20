@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bb377ff4fd5bf61c6d9061f2cbffd676144e6f4ae61fba2a222ba9c4a530033b
+-- hash: 26944664c2c01589b5bb36de9f85d23c60ac2b887f56df1eef9bd7e7931ff965
 
 name:           haskell-http
 version:        0.1.0.0
@@ -28,6 +28,8 @@ source-repository head
 library
   exposed-modules:
       Adapter.Effect.AsyncTask
+      Adapter.Http.CommandProducts
+      Adapter.Http.GetProducts
       Adapter.Http.Products
       Adapter.Katip.Logger
       Adapter.Postgres.Config.PostgresConfig

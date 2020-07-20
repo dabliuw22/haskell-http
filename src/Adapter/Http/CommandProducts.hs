@@ -2,12 +2,12 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Adapter.Http.CommandProducts where
+module Adapter.Http.CommandProducts (CommandProductRoute, routes) where
 
 import Application.Products
 import Control.Exception (try)
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.Aeson
+import Data.Aeson (FromJSON)
 import Data.Text (Text, pack)
 import Data.Time (ZonedTime, getZonedTime)
 import Data.UUID.V1 (nextUUID)
@@ -17,8 +17,7 @@ import GHC.Generics (Generic)
 import Servant
 import Data.Maybe (fromJust)
 
-type CommandProductRoute =
-  "products" :> ReqBody '[JSON] CreateProductDto :> PostCreated '[JSON] ()
+type CommandProductRoute = ReqBody '[JSON] CreateProductDto :> PostCreated '[JSON] ()
 
 data CreateProductDto =
   CreateProductDto {

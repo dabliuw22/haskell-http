@@ -2,12 +2,12 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Adapter.Http.Products (ProductRoute, routes) where
+module Adapter.Http.GetProducts (GetProductRoute, routes) where
 
 import Application.Products
 import Control.Exception (try)
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.Aeson
+import Control.Monad.IO.Class (liftIO)
+import Data.Aeson (ToJSON)
 import Data.Text (Text)
 import Data.Time (ZonedTime)
 import qualified Domain.Products as DOMAIN
@@ -15,8 +15,8 @@ import GHC.Generics (Generic)
 import Servant
 import Data.Maybe (fromJust)
 
-type ProductRoute =
-  "products" :> (
+type GetProductRoute =
+  (
     Get '[JSON] [GetProductDto] :<|>
     Capture "id" Text :> Get '[JSON] GetProductDto
   ) -- or 
@@ -37,7 +37,7 @@ instance ToJSON GetProductDto
 
 routes :: IO [DOMAIN.Product]
   -> (Text -> IO (Maybe DOMAIN.Product))
-  -> Server ProductRoute
+  -> Server GetProductRoute
 routes f1 f2 = allProducts f1 :<|> oneProduct f2 
 
 oneProduct :: (Text -> IO (Maybe DOMAIN.Product)) -> Text -> Handler GetProductDto
