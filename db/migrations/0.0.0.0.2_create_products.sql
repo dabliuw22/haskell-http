@@ -6,4 +6,4 @@ CREATE TABLE products (
 );
 
 INSERT INTO products (id, name, stock, created_at)
-    VALUES ('d91ae396-42e7-4483-a3ef-e729c486980f', 'p1', 10.0, now());
+    VALUES ('d91ae396-42e7-4483-a3ef-e729c486980f', 'Product One', 10.0, now());

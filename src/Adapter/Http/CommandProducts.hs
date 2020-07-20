@@ -24,7 +24,7 @@ data CreateProductDto =
     product_name :: Text,
     product_stock :: Double
   } deriving (Generic, Show)
-  
+
 instance FromJSON CreateProductDto
 
 routes ::  (DOMAIN.Product -> IO ())
@@ -39,13 +39,13 @@ createProduct f' dto' = do
   result <- liftIO $ try (f' (from dto' uuid' createdAt))
   case result of
       Right v -> return v
-      Left e  -> 
+      Left e  ->
         case e of
-          DOMAIN.ProductException s -> throwError 
+          DOMAIN.ProductException s -> throwError
             err400 {
               errBody = "Error Create Product"
             }
-                        
+
 from :: CreateProductDto -> Text -> ZonedTime -> DOMAIN.Product
 from dto uuid createdAt =
   DOMAIN.Product {
