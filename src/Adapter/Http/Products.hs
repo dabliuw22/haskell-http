@@ -8,7 +8,7 @@ import Data.Text (Text)
 import Domain.Products
 import Servant
 
-type ProductRoute = 
+type ProductRoute =
   "products" :> (GET.GetProductRoute :<|> COMMAND.CommandProductRoute)
 
 routes :: IO [Product]
