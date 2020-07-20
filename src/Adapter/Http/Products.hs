@@ -9,7 +9,7 @@ import Domain.Products
 import Servant
 
 type ProductRoute = 
-  "products" :> (GET.GetProductRoute :<|> COMMAND.CommandProductRoute )
+  "products" :> (GET.GetProductRoute :<|> COMMAND.CommandProductRoute)
 
 routes :: IO [Product]
   -> (Text -> IO (Maybe Product))
