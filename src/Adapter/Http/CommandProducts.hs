@@ -21,8 +21,8 @@ type CommandProductRoute = ReqBody '[JSON] CreateProductDto :> PostCreated '[JSO
 
 data CreateProductDto =
   CreateProductDto {
-    name :: Text,
-    stock :: Double
+    product_name :: Text,
+    product_stock :: Double
   } deriving (Generic, Show)
   
 instance FromJSON CreateProductDto
@@ -50,7 +50,7 @@ from :: CreateProductDto -> Text -> ZonedTime -> DOMAIN.Product
 from dto uuid createdAt =
   DOMAIN.Product {
     DOMAIN.productId = DOMAIN.ProductId uuid,
-    DOMAIN.productName = DOMAIN.ProductName (name dto),
-    DOMAIN.productStock = DOMAIN.ProductStock (stock dto),
+    DOMAIN.productName = DOMAIN.ProductName (product_name dto),
+    DOMAIN.productStock = DOMAIN.ProductStock (product_stock dto),
     DOMAIN.productCreatedAt = DOMAIN.ProductCreatedAt createdAt
   }
