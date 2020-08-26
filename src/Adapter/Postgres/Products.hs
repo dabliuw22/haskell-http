@@ -5,7 +5,7 @@
 module Adapter.Postgres.Products (ProductRepository(..)) where
 
 import qualified Adapter.Effect.AsyncTask as ASYNC
-import qualified Adapter.Postgres.Util.PostgresUtil as UTIL
+import qualified Adapter.Postgres.Util.Postgres as UTIL
 import Control.Exception (catch)
 import Control.Monad.Catch (MonadThrow, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)

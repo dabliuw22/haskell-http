@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 26944664c2c01589b5bb36de9f85d23c60ac2b887f56df1eef9bd7e7931ff965
+-- hash: 7431233469312219be98552c9fc17b8c6b1eb80beda45e5ee14e678e48efd384
 
 name:           haskell-http
 version:        0.1.0.0
@@ -35,7 +35,7 @@ library
       Adapter.Postgres.Config.PostgresConfig
       Adapter.Postgres.Migration.PostgresMigration
       Adapter.Postgres.Products
-      Adapter.Postgres.Util.PostgresUtil
+      Adapter.Postgres.Util.Postgres
       Application.Products
       Domain.Products
   other-modules:

@@ -3,7 +3,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE BlockArguments #-}
-module Adapter.Postgres.Util.PostgresUtil (PostgresUtil(..), PostgresException(..)) where
+module Adapter.Postgres.Util.Postgres (Postgres(..), PostgresException(..)) where
 
 import Adapter.Katip.Logger
 import Control.Exception (Exception, catch)
@@ -17,7 +17,7 @@ import Database.PostgreSQL.Simple.ToRow
 import Katip
 import Data.Int (Int64)
 
-class PostgresUtil m where
+class Postgres m where
   queryOne :: (FromRow a, ToRow b) => Pool PG.Connection
     -> PG.Query -> b -> m (Maybe a)
   queryListWithoutParams :: FromRow a => Pool PG.Connection
@@ -27,7 +27,7 @@ class PostgresUtil m where
   command :: ToRow b => Pool PG.Connection -> PG.Query
     -> b -> m (Bool)
 
-instance PostgresUtil IO where
+instance Postgres IO where
   queryOne pool q b = queryOne' pool q b
   queryListWithoutParams pool q = queryListWithoutParams' pool q
   queryList pool q b = queryList' pool q b
