@@ -12,18 +12,9 @@ class (Monad m, Functor m) => ProductService m where
   create :: (DOMAIN.Product -> m Bool) -> DOMAIN.Product -> m ()
 
 instance ProductService IO where
-  findById f id = findById' f id
-  findAll f = findAll' f
+  findById f id = f id
+  findAll f = f
   create f product = create' f product
-
-findById' :: (Functor m, Monad m)
-  => (Text -> m (Maybe DOMAIN.Product))
-  -> Text -> m (Maybe DOMAIN.Product)
-findById' f' = f'
-
-findAll' :: (Functor m, Monad m)
-  => m [DOMAIN.Product] -> m [DOMAIN.Product]
-findAll' f' = f'
 
 create' :: (Functor m, Monad m, MonadThrow m)
   => (DOMAIN.Product -> m Bool) -> DOMAIN.Product -> m ()
