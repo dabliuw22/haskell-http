@@ -42,6 +42,7 @@ dependencies:
 - warp
 - directory
 - time
+- lens
 
 default-extensions:
 - TemplateHaskell

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7431233469312219be98552c9fc17b8c6b1eb80beda45e5ee14e678e48efd384
+-- hash: 0bd030e1bfc4354f38b379ab9355f5b3099b6e98febc676c6cefc0ede662a086
 
 name:           haskell-http
 version:        0.1.0.0
@@ -53,6 +53,7 @@ library
     , exceptions
     , hspec
     , katip
+    , lens
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
@@ -86,6 +87,7 @@ executable haskell-http-exe
     , haskell-http
     , hspec
     , katip
+    , lens
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
@@ -120,6 +122,7 @@ test-suite haskell-http-test
     , haskell-http
     , hspec
     , katip
+    , lens
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
