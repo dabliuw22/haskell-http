@@ -35,3 +35,5 @@ Requirements:
         "product_stock": 22.0
     }'
     ```
+5. Run tests:
+    `stack test`

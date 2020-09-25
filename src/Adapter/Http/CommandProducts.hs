@@ -17,7 +17,7 @@ import GHC.Generics (Generic)
 import Servant
 import Data.Maybe (fromJust)
 
-type CommandProductRoute = ReqBody '[JSON] CreateProductDto :> PostCreated '[JSON] ()
+type CommandProductRoute = ReqBody '[JSON] CreateProductDto :> PostCreated '[JSON] NoContent
 
 data CreateProductDto =
   CreateProductDto {
@@ -31,14 +31,14 @@ routes ::  (DOMAIN.Product -> IO ())
   -> Server CommandProductRoute
 routes = createProduct
 
-createProduct :: (DOMAIN.Product -> IO ()) -> CreateProductDto -> Handler ()
+createProduct :: (DOMAIN.Product -> IO ()) -> CreateProductDto -> Handler NoContent
 createProduct f' dto' = do
   uuid <- liftIO nextUUID
   let uuid' = pack (UUID.toString (fromJust uuid))
   createdAt <- liftIO getZonedTime
   result <- liftIO $ try (f' (from dto' uuid' createdAt))
   case result of
-      Right v -> return v
+      Right v -> return NoContent
       Left e  ->
         case e of
           DOMAIN.ProductException s -> throwError

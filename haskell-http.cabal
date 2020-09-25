@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0bd030e1bfc4354f38b379ab9355f5b3099b6e98febc676c6cefc0ede662a086
+-- hash: 6a68b404662ad4c65f4e44a6e7d71c9f76dcd846e88c59b5a3569305b91a756e
 
 name:           haskell-http
 version:        0.1.0.0
@@ -106,6 +106,7 @@ test-suite haskell-http-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Application.ProductsSpec
       Paths_haskell_http
   hs-source-dirs:
       test

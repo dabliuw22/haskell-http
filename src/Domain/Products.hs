@@ -26,6 +26,6 @@ instance Eq Product where
   (==) p1 p2 = productId p1 == productId p2
   (/=) p1 p2 = productId p1 /= productId p2
   
-newtype ProductException = ProductException String deriving (Show, Typeable)
+newtype ProductException = ProductException String deriving (Show, Eq, Typeable)
 
 instance Exception ProductException
