@@ -1,8 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeOperators #-}
 module Main where
 
 import qualified Application.Products as SERVICE

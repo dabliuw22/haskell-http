@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
---{-# LANGUAGE BlockArguments #-}
 module Application.ProductsSpec where
 
 import Application.Products

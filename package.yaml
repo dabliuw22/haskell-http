@@ -44,9 +44,6 @@ dependencies:
 - time
 - lens
 
-default-extensions:
-- TemplateHaskell
-
 library:
   source-dirs: src
 
