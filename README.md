@@ -36,4 +36,4 @@ Requirements:
     }'
     ```
 5. Run tests:
-    `stack test`
+    `stack test` or `stack ghci haskell-http:haskell-http-test`
