@@ -14,6 +14,7 @@ import Data.Proxy
 import Katip
 import Network.Wai (Application)
 import Network.Wai.Handler.Warp (run)
+import Network.Wai.Middleware.Cors (simpleCors)
 import Servant
 import System.Environment (lookupEnv)
 
@@ -33,7 +34,7 @@ main = do
   logger $ \logEnv -> do
     runKatipContextT logEnv () "server-start" $ do
       $(logTM) InfoS "Start Server..."
-  run port' server
+  run port' $ simpleCors server
 
 type API = HTTP.ProductRoute
 
