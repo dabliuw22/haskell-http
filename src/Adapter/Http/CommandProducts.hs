@@ -5,7 +5,9 @@
 module Adapter.Http.CommandProducts (CommandProductRoute, routes) where
 
 import Application.Products
+import Control.Applicative (empty)
 import Control.Exception (try)
+import Control.Monad.Catch (MonadThrow, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Aeson (FromJSON)
 import Data.Text (Text, pack)
@@ -17,37 +19,73 @@ import GHC.Generics (Generic)
 import Servant
 import Data.Maybe (fromJust)
 
-type CommandProductRoute = ReqBody '[JSON] CreateProductDto :> PostCreated '[JSON] NoContent
+type CommandProductRoute = 
+  (
+    ReqBody '[JSON] CommandProductDto :> PostCreated '[JSON] NoContent :<|>
+    Capture "id" Text :> Delete '[JSON] NoContent :<|>
+    Capture "id" Text :> ReqBody '[JSON] CommandProductDto :> Put '[JSON] NoContent
+  )
 
-data CreateProductDto =
-  CreateProductDto {
+data CommandProductDto =
+  CommandProductDto {
     product_name :: Text,
     product_stock :: Double
-  } deriving (Generic, Show)
+  } deriving (Show, Generic)
 
-instance FromJSON CreateProductDto
+
+instance FromJSON CommandProductDto where
 
 routes ::  (DOMAIN.Product -> IO ())
+  -> (Text -> IO ())
+  -> (Text -> Text -> Double -> IO ())
   -> Server CommandProductRoute
-routes = createProduct
+routes f1 f2 f3 = createProduct f1 :<|> deleteProduct f2 :<|> updateProduct f3
 
-createProduct :: (DOMAIN.Product -> IO ()) -> CreateProductDto -> Handler NoContent
+createProduct :: (DOMAIN.Product -> IO ()) 
+  -> CommandProductDto -> Handler NoContent
 createProduct f' dto' = do
   uuid <- liftIO nextUUID
   let uuid' = pack (UUID.toString (fromJust uuid))
   createdAt <- liftIO getZonedTime
-  result <- liftIO $ try (f' (from dto' uuid' createdAt))
+  result <- liftIO $ try (f' (productfrom dto' uuid' createdAt))
+  case result of
+    Right v -> return NoContent
+    Left e  ->
+      case e of
+        DOMAIN.ProductException s -> throwError
+          err400 {
+            errBody = "Error Create Product"
+          }
+            
+deleteProduct :: (Text -> IO ()) -> Text -> Handler NoContent
+deleteProduct f' id' = do
+  result <- liftIO $ try (f' id')
+  case result of
+    Right v -> return NoContent
+    Left e  -> 
+      case e of
+        DOMAIN.ProductException s -> throwError
+          err400 {
+            errBody = "Error Delete Product"
+          }
+
+updateProduct :: (Text -> Text -> Double -> IO ()) -> Text
+  -> CommandProductDto -> Handler NoContent
+updateProduct f' id' dto' = do
+  let name = product_name dto'
+      stock = product_stock dto'
+  result <- liftIO $ try (f' id' name  stock)
   case result of
       Right v -> return NoContent
-      Left e  ->
+      Left e  -> 
         case e of
           DOMAIN.ProductException s -> throwError
             err400 {
-              errBody = "Error Create Product"
-            }
+              errBody = "Error Update Product"
+            } 
 
-from :: CreateProductDto -> Text -> ZonedTime -> DOMAIN.Product
-from dto uuid createdAt =
+productfrom :: CommandProductDto -> Text -> ZonedTime -> DOMAIN.Product
+productfrom dto uuid createdAt =
   DOMAIN.Product {
     DOMAIN.productId = DOMAIN.ProductId uuid,
     DOMAIN.productName = DOMAIN.ProductName (product_name dto),
