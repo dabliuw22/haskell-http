@@ -14,7 +14,12 @@ import Data.Proxy
 import Katip
 import Network.Wai (Application)
 import Network.Wai.Handler.Warp (run)
-import Network.Wai.Middleware.Cors (simpleCors)
+import Network.Wai.Middleware.Cors (
+  cors,
+  corsMethods,
+  corsRequestHeaders,
+  simpleCorsResourcePolicy,
+  simpleCors)
 import Servant
 import System.Environment (lookupEnv)
 
@@ -30,11 +35,13 @@ main = do
   let f1 = SERVICE.findAll (REPO.findAll pool)
       f2 = SERVICE.findById (REPO.findById pool)
       f3 = SERVICE.create (REPO.create pool)
-      server = serve proxy $ routes f1 f2 f3
+      f4 = SERVICE.deleteById (REPO.deleteById pool)
+      f5 = SERVICE.update (REPO.update pool)
+      server = serve proxy $ routes f1 f2 f3 f4 f5
   logger $ \logEnv -> do
     runKatipContextT logEnv () "server-start" $ do
       $(logTM) InfoS "Start Server..."
-  run port' $ simpleCors server
+  run port' $ corsMiddleware server -- run port' $ simpleCors server
 
 type API = HTTP.ProductRoute
 
@@ -42,5 +49,12 @@ routes = HTTP.routes
   
 proxy :: Proxy API
 proxy = Proxy
+
+corsMiddleware :: Application -> Application
+corsMiddleware = cors 
+  (const $ Just (simpleCorsResourcePolicy {
+      corsMethods = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"],
+      corsRequestHeaders = ["Content-Type"]
+    }))
 
 --server :: Application
