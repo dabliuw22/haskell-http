@@ -14,5 +14,7 @@ type ProductRoute =
 routes :: IO [Product]
   -> (Text -> IO (Maybe Product))
   -> (Product -> IO ())
+  -> (Text -> IO ())
+  -> (Text -> Text -> Double -> IO ())
   -> Server ProductRoute
-routes f1 f2 f3 = GET.routes f1 f2 :<|> COMMAND.routes f3
+routes f1 f2 f3 f4 f5 = GET.routes f1 f2 :<|> COMMAND.routes f3 f4 f5
