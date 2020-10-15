@@ -37,7 +37,7 @@ Requirements:
     ```
    
 5. Test with frontend client:
-    (elm-http-client)[https://github.com/dabliuw22/elm-http-client]
+    (https://github.com/dabliuw22/elm-http-client)[elm-http-client]
  
 6. Run tests:
     `stack test` or `stack ghci haskell-http:haskell-http-test`
