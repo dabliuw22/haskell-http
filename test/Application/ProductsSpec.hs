@@ -1,14 +1,31 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module Application.ProductsSpec where
 
 import Application.Products
-import Control.Monad.IO.Class (liftIO, MonadIO)
+  ( ProductService (create, findAll, findById),
+  )
+import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Maybe (fromJust)
 import Data.Text (Text, pack)
 import Data.Time (ZonedTime, getZonedTime)
 import qualified Data.UUID as UUID
 import Domain.Products
+  ( Product (..),
+    ProductCreatedAt (ProductCreatedAt),
+    ProductException (ProductException),
+    ProductId (ProductId),
+    ProductName (ProductName),
+    ProductStock (ProductStock),
+  )
 import Test.Hspec
+  ( Spec,
+    context,
+    describe,
+    it,
+    shouldBe,
+    shouldThrow,
+  )
 
 spec :: Spec
 spec = do
@@ -40,26 +57,27 @@ spec = do
       it "Should return ProductException" $ do
         p <- f1' "fake_id"
         let newProduct = fromJust p
-        create (f2' False) newProduct 
+        create (f2' False) newProduct
           `shouldThrow` (== ProductException "I don't know changes")
-        
+
 f1' :: (MonadIO m) => Text -> m (Maybe Product)
 f1' id = do
   createdAt <- liftIO getZonedTime
   return $ Just $ mkProduct id createdAt
-  
+
 f2' :: (MonadIO m) => Bool -> Product -> m Bool
 f2' b p = return b
-  
+
 mkProduct :: Text -> ZonedTime -> Product
-mkProduct id createdAt = Product {
-  productId = ProductId id,
-  productName = ProductName "product_name",
-  productStock = ProductStock 100,
-  productCreatedAt = ProductCreatedAt createdAt
-}
-  
+mkProduct id createdAt =
+  Product
+    { productId = ProductId id,
+      productName = ProductName "product_name",
+      productStock = ProductStock 100,
+      productCreatedAt = ProductCreatedAt createdAt
+    }
+
 status :: Maybe a -> Bool
 status m = case m of
   Just v -> True
-  _      -> False
+  _ -> False

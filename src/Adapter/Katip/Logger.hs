@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module Adapter.Katip.Logger (logger) where
 
 import Control.Exception (bracket)
@@ -6,9 +7,21 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Maybe (fromMaybe)
 import Data.String (fromString)
 import Katip
-import System.IO (stdout)
+  ( ColorStrategy (ColorIfTerminal),
+    LogEnv,
+    Severity (InfoS),
+    Verbosity (V2),
+    closeScribes,
+    defaultScribeSettings,
+    initLogEnv,
+    mkFileScribe,
+    mkHandleScribe,
+    permitItem,
+    registerScribe,
+  )
 import System.Directory (createDirectoryIfMissing)
 import System.Environment (lookupEnv)
+import System.IO (stdout)
 
 logger :: (LogEnv -> IO a) -> IO a
 logger action = do
@@ -18,8 +31,10 @@ logger action = do
     makeLogEnv = do
       appName <- lookupEnv "APP_NAME"
       env <- lookupEnv "APP_ENV"
-      logEnv <- initLogEnv (fromString $ fromMaybe "haskell-http" appName) 
-        (fromString $ fromMaybe "local" env)
+      logEnv <-
+        initLogEnv
+          (fromString $ fromMaybe "haskell-http" appName)
+          (fromString $ fromMaybe "local" env)
       logsDirEnv <- lookupEnv "LOGS_DIR"
       let dir = fromMaybe "logs" logsDirEnv
           file = dir ++ "/" ++ logFilename
