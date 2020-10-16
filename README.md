@@ -8,11 +8,20 @@ Requirements:
    * Docker
    * Docker Compose
     
-1. Run Containers: `docker-compose up -d`
+1. Run Containers: 
+    ```
+    $ docker-compose up -d
+    ```
 
-2. Build: `stack build`
+2. Build: 
+    ```
+    $ stack build
+    ```
 
-3. Run: `stack exec haskell-http-exe`
+3. Run: 
+    ```
+    $ stack exec haskell-http-exe
+    ```
 
 4. Test with cURL:
 
@@ -39,5 +48,15 @@ Requirements:
 5. Test with frontend client:
     [elm-http-client](https://github.com/dabliuw22/elm-http-client)
  
+ 
+6. Apply formatter:
+    ```
+    $ stack install ormolu --resolver=lts-16.3
+    $ cabal update
+    $ cabal new-install ormolu
+    $ ormolu --mode inplace $(find . -name '*.hs')
+    ```
 6. Run tests:
-    `stack test` or `stack ghci haskell-http:haskell-http-test`
+    ```
+    $ stack test -- or `stack ghci haskell-http:haskell-http-test`
+    ``` 
