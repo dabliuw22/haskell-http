@@ -51,9 +51,12 @@ Requirements:
  
 6. Apply formatter:
     ```
+    # With stack
     $ stack install ormolu --resolver=lts-16.3
+    # With cabal
     $ cabal update
     $ cabal new-install ormolu
+    # Apply
     $ ormolu --mode inplace $(find . -name '*.hs')
     ```
 6. Run tests:
