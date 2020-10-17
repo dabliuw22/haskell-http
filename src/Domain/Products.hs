@@ -7,13 +7,25 @@ import Data.Text (Text)
 import Data.Time (ZonedTime)
 import Data.Typeable (Typeable)
 
-newtype ProductId = ProductId {id :: Text} deriving (Show, Eq)
+newtype ProductId = ProductId
+  { id :: Text
+  }
+  deriving (Show, Eq)
 
-newtype ProductName = ProductName {name :: Text} deriving (Show, Eq)
+newtype ProductName = ProductName
+  { name :: Text
+  }
+  deriving (Show, Eq)
 
-newtype ProductStock = ProductStock {stock :: Double} deriving (Show, Eq)
+newtype ProductStock = ProductStock
+  { stock :: Double
+  }
+  deriving (Show, Eq)
 
-newtype ProductCreatedAt = ProductCreatedAt {createdAt :: ZonedTime} deriving (Show)
+newtype ProductCreatedAt = ProductCreatedAt
+  { createdAt :: ZonedTime
+  }
+  deriving (Show)
 
 data Product = Product
   { productId :: ProductId,

@@ -4,7 +4,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Adapter.Postgres.Util.Postgres (Postgres (..), PostgresException (..)) where
+module Adapter.Postgres.Util.Postgres
+  ( Postgres (..),
+    PostgresException (..),
+  )
+where
 
 import Adapter.Katip.Logger (logger)
 import Control.Exception (Exception, catch)
@@ -171,7 +175,11 @@ newtype PostgresException = PostgresException String deriving (Show, Typeable)
 
 instance Exception PostgresException
 
-handleSqlError :: (MonadIO m, MonadThrow m) => PG.SqlError -> Namespace -> m a
+handleSqlError ::
+  (MonadIO m, MonadThrow m) =>
+  PG.SqlError ->
+  Namespace ->
+  m a
 handleSqlError e@(PG.SqlError _ _ msg _ _) namespace = do
   liftIO $
     logger $ \logEnv -> do
@@ -179,7 +187,11 @@ handleSqlError e@(PG.SqlError _ _ msg _ _) namespace = do
         $(logTM) ErrorS $ logStr ("SQL Error: " ++ show e)
   throwM $ PostgresException (show e)
 
-handleResultError :: (MonadIO m, MonadThrow m) => PG.ResultError -> Namespace -> m a
+handleResultError ::
+  (MonadIO m, MonadThrow m) =>
+  PG.ResultError ->
+  Namespace ->
+  m a
 handleResultError e namespace = do
   liftIO $
     logger $ \logEnv -> do
@@ -190,7 +202,11 @@ handleResultError e namespace = do
     PG.UnexpectedNull _ _ _ _ msg -> throwM $ PostgresException msg
     PG.ConversionFailed _ _ _ _ msg -> throwM $ PostgresException msg
 
-handleFormatError :: (MonadIO m, MonadThrow m) => PG.FormatError -> Namespace -> m a
+handleFormatError ::
+  (MonadIO m, MonadThrow m) =>
+  PG.FormatError ->
+  Namespace ->
+  m a
 handleFormatError e namespace = do
   liftIO $
     logger $ \logEnv -> do
@@ -198,7 +214,11 @@ handleFormatError e namespace = do
         $(logTM) ErrorS $ logStr ("SQL Format Error: " ++ show e)
   throwM $ PostgresException (show e)
 
-handleQueryError :: (MonadIO m, MonadThrow m) => PG.QueryError -> Namespace -> m a
+handleQueryError ::
+  (MonadIO m, MonadThrow m) =>
+  PG.QueryError ->
+  Namespace ->
+  m a
 handleQueryError e namespace = do
   liftIO $
     logger $ \logEnv -> do

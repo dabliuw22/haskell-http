@@ -1,4 +1,9 @@
-module Adapter.Postgres.Config.PostgresConfig (PgConfig (..), create, destroy) where
+module Adapter.Postgres.Config.PostgresConfig
+  ( PgConfig (..),
+    create,
+    destroy,
+  )
+where
 
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Maybe (fromMaybe)

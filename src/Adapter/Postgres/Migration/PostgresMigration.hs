@@ -13,7 +13,11 @@ import qualified Database.PostgreSQL.Simple as PG
 import qualified Database.PostgreSQL.Simple.Migration as M
 import Katip (Severity (ErrorS), logStr, logTM, runKatipContextT)
 
-migrate :: (MonadIO m, MonadThrow m) => Pool PG.Connection -> String -> m ()
+migrate ::
+  (MonadIO m, MonadThrow m) =>
+  Pool PG.Connection ->
+  String ->
+  m ()
 migrate pool dir = do
   migration <-
     liftIO $
