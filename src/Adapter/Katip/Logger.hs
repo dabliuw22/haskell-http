@@ -5,6 +5,7 @@ module Adapter.Katip.Logger (logger) where
 import Control.Exception (bracket)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Maybe (fromMaybe)
+import Data.Semigroup ((<>))
 import Data.String (fromString)
 import Katip
   ( ColorStrategy (ColorIfTerminal),
@@ -17,7 +18,7 @@ import Katip
     mkFileScribe,
     mkHandleScribe,
     permitItem,
-    registerScribe,
+    registerScribe
   )
 import System.Directory (createDirectoryIfMissing)
 import System.Environment (lookupEnv)
@@ -37,8 +38,8 @@ logger action = do
           (fromString $ fromMaybe "local" env)
       logsDirEnv <- lookupEnv "LOGS_DIR"
       let dir = fromMaybe "logs" logsDirEnv
-          file = dir ++ "/" ++ logFilename
-      dirCreated <- createDirectoryIfMissing True dir
+          file = dir <> "/" <> logFilename -- dir ++ "/" ++ logFilename
+      _ <- createDirectoryIfMissing True dir
       stdoutScribe <- mkHandleScribe ColorIfTerminal stdout (permitItem InfoS) V2
       fileScribe <- mkFileScribe file (permitItem InfoS) V2
       newLogEnv <- registerScribe "stdout" stdoutScribe defaultScribeSettings logEnv

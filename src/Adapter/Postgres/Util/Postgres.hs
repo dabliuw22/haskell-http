@@ -72,13 +72,13 @@ queryOne' p' q' b = do
   result <-
     liftIO $
       withResource p' (\conn -> PG.query conn q' b)
-        `catch` \e ->
-          handleSqlError e namespace
-            `catch` \e ->
-              handleResultError e namespace
-                `catch` \e ->
-                  handleFormatError e namespace
-                    `catch` \e -> handleQueryError e namespace
+        `catch` \e1 ->
+          handleSqlError e1 namespace
+            `catch` \e2 ->
+              handleResultError e2 namespace
+                `catch` \e3 ->
+                  handleFormatError e3 namespace
+                    `catch` \e4 -> handleQueryError e4 namespace
   liftIO $
     logger $ \logEnv -> do
       runKatipContextT logEnv () namespace $ do
@@ -103,13 +103,13 @@ queryList' p' q' b = do
   result <-
     liftIO $
       withResource p' (\conn -> PG.query conn q' b)
-        `catch` \e ->
-          handleSqlError e namespace
-            `catch` \e ->
-              handleResultError e namespace
-                `catch` \e ->
-                  handleFormatError e namespace
-                    `catch` \e -> handleQueryError e namespace
+        `catch` \e1 ->
+          handleSqlError e1 namespace
+            `catch` \e2 ->
+              handleResultError e2 namespace
+                `catch` \e3 ->
+                  handleFormatError e3 namespace
+                    `catch` \e4 -> handleQueryError e4 namespace
   liftIO $
     logger $ \logEnv -> do
       runKatipContextT logEnv () namespace $ do
@@ -131,13 +131,13 @@ queryListWithoutParams' p' q' = do
   result <-
     liftIO $
       withResource p' (`PG.query_` q')
-        `catch` \e ->
-          handleSqlError e namespace
-            `catch` \e ->
-              handleResultError e namespace
-                `catch` \e ->
-                  handleFormatError e namespace
-                    `catch` \e -> handleQueryError e namespace
+        `catch` \e1 ->
+          handleSqlError e1 namespace
+            `catch` \e2 ->
+              handleResultError e2 namespace
+                `catch` \e3 ->
+                  handleFormatError e3 namespace
+                    `catch` \e4 -> handleQueryError e4 namespace
   liftIO $
     logger $ \logEnv -> do
       runKatipContextT logEnv () namespace $ do
@@ -160,9 +160,9 @@ command' p' q' b = do
   result <-
     liftIO $
       withResource p' (\conn -> PG.execute conn q' b)
-        `catch` \e ->
-          handleSqlError e namespace
-            `catch` \e -> handleFormatError e namespace
+        `catch` \e1 ->
+          handleSqlError e1 namespace
+            `catch` \e2 -> handleFormatError e2 namespace
   liftIO $
     logger $ \logEnv -> do
       runKatipContextT logEnv () namespace $ do
@@ -184,7 +184,7 @@ handleSqlError e@(PG.SqlError _ _ msg _ _) namespace = do
   liftIO $
     logger $ \logEnv -> do
       runKatipContextT logEnv () namespace $ do
-        $(logTM) ErrorS $ logStr ("SQL Error: " ++ show e)
+        $(logTM) ErrorS $ logStr ("SQL Error: " <> show e)
   throwM $ PostgresException (show e)
 
 handleResultError ::
@@ -196,7 +196,7 @@ handleResultError e namespace = do
   liftIO $
     logger $ \logEnv -> do
       runKatipContextT logEnv () namespace $ do
-        $(logTM) ErrorS $ logStr ("SQL Result Error: " ++ show e)
+        $(logTM) ErrorS $ logStr ("SQL Result Error: " <> show e)
   case e of
     PG.Incompatible _ _ _ _ msg -> throwM $ PostgresException msg
     PG.UnexpectedNull _ _ _ _ msg -> throwM $ PostgresException msg
@@ -211,7 +211,7 @@ handleFormatError e namespace = do
   liftIO $
     logger $ \logEnv -> do
       runKatipContextT logEnv () namespace $ do
-        $(logTM) ErrorS $ logStr ("SQL Format Error: " ++ show e)
+        $(logTM) ErrorS $ logStr ("SQL Format Error: " <> show e)
   throwM $ PostgresException (show e)
 
 handleQueryError ::
@@ -223,5 +223,5 @@ handleQueryError e namespace = do
   liftIO $
     logger $ \logEnv -> do
       runKatipContextT logEnv () namespace $ do
-        $(logTM) ErrorS $ logStr ("SQL Query Error: " ++ show e)
+        $(logTM) ErrorS $ logStr ("SQL Query Error: " <> show e)
   throwM $ PostgresException (show e)
