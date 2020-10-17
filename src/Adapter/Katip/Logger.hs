@@ -18,7 +18,7 @@ import Katip
     mkFileScribe,
     mkHandleScribe,
     permitItem,
-    registerScribe
+    registerScribe,
   )
 import System.Directory (createDirectoryIfMissing)
 import System.Environment (lookupEnv)
