@@ -48,7 +48,12 @@ instance FromRow ProductRow where
   fromRow = ProductRow <$> field <*> field <*> field <*> field
 
 instance ToRow ProductRow where
-  toRow p = [toField (_id p), toField (_name p), toField (_stock p), toField (_create_at p)]
+  toRow p =
+    [ toField (_id p),
+      toField (_name p),
+      toField (_stock p),
+      toField (_create_at p)
+    ]
 
 findById' ::
   MonadIO m =>
