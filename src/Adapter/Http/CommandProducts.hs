@@ -5,6 +5,7 @@
 
 module Adapter.Http.CommandProducts (CommandProductRoute, routes) where
 
+import Adapter.Http.Error (error400)
 import Application.Products ()
 import Control.Applicative (empty)
 import Control.Exception (try)
@@ -28,9 +29,6 @@ import Servant
     Put,
     ReqBody,
     Server,
-    ServerError (errBody),
-    err400,
-    throwError,
     type (:<|>) (..),
     type (:>),
   )
@@ -69,11 +67,7 @@ createProduct f' dto' = do
     Right _ -> return NoContent
     Left e ->
       case e of
-        DOMAIN.ProductException _ ->
-          throwError
-            err400
-              { errBody = "Error Create Product"
-              }
+        DOMAIN.ProductException _ -> error400 "Error Create Product"
 
 deleteProduct :: (Text -> IO ()) -> Text -> Handler NoContent
 deleteProduct f' id' = do
@@ -82,11 +76,7 @@ deleteProduct f' id' = do
     Right _ -> return NoContent
     Left e ->
       case e of
-        DOMAIN.ProductException _ ->
-          throwError
-            err400
-              { errBody = "Error Delete Product"
-              }
+        DOMAIN.ProductException _ -> error400 "Error Delete Product"
 
 updateProduct ::
   (Text -> Text -> Double -> IO ()) ->
@@ -101,11 +91,7 @@ updateProduct f' id' dto' = do
     Right _ -> return NoContent
     Left e ->
       case e of
-        DOMAIN.ProductException _ ->
-          throwError
-            err400
-              { errBody = "Error Update Product"
-              }
+        DOMAIN.ProductException _ -> error400 "Error Update Product"
 
 productfrom :: CommandProductDto -> Text -> ZonedTime -> DOMAIN.Product
 productfrom dto uuid createdAt =

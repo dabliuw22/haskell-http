@@ -5,6 +5,10 @@
 
 module Adapter.Http.GetProducts (GetProductRoute, routes) where
 
+import Adapter.Http.Error
+  ( error404,
+    error500,
+  )
 import Application.Products ()
 import Control.Exception (try)
 import Control.Monad.IO.Class (liftIO)
@@ -20,10 +24,6 @@ import Servant
     Handler,
     JSON,
     Server,
-    ServerError (errBody),
-    err404,
-    err500,
-    throwError,
     type (:<|>) (..),
     type (:>),
   )
@@ -58,11 +58,7 @@ oneProduct f' id' = do
   result <- liftIO $ f' id'
   case result of
     Just value -> return $ to value
-    Nothing ->
-      throwError
-        err404
-          { errBody = "Not Found Product"
-          }
+    Nothing -> error404 "Not Found Product"
 
 allProducts :: IO [DOMAIN.Product] -> Handler [GetProductDto]
 allProducts f' = do
@@ -71,11 +67,7 @@ allProducts f' = do
     Right v -> return v
     Left e ->
       case e of
-        DOMAIN.ProductException _ ->
-          throwError
-            err500
-              { errBody = "Error Get All Products"
-              }
+        DOMAIN.ProductException _ -> error500 "Error Get All Products"
 
 to :: DOMAIN.Product -> GetProductDto
 to p =
