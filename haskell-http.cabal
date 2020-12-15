@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 11660296f28dbb031e0a708288c3f87e879f6a796462a8876f4d0cde6cad00db
+-- hash: 1369e52729978be2f7ffa27b3d73e1814859db32478cce2cfdddf3fe0a6f15cf
 
 name:           haskell-http
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Adapter.Effect.AsyncTask
       Adapter.Http.CommandProducts
+      Adapter.Http.Error
       Adapter.Http.GetProducts
       Adapter.Http.Products
       Adapter.Katip.Logger
@@ -51,6 +52,7 @@ library
     , directory
     , exceptions
     , hspec
+    , http-types
     , katip
     , lens
     , mtl
@@ -84,6 +86,7 @@ executable haskell-http-exe
     , exceptions
     , haskell-http
     , hspec
+    , http-types
     , katip
     , lens
     , mtl
@@ -119,6 +122,7 @@ test-suite haskell-http-test
     , exceptions
     , haskell-http
     , hspec
+    , http-types
     , katip
     , lens
     , mtl
