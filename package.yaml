@@ -36,6 +36,8 @@ dependencies:
 - aeson
 - servant
 - servant-server
+- servant-auth-server
+- jose
 - katip
 - wai
 - wai-cors

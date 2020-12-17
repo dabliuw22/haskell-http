@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1369e52729978be2f7ffa27b3d73e1814859db32478cce2cfdddf3fe0a6f15cf
+-- hash: a96e9eeb509672d5512c1a3100f6f6b4511b0b3a7047dfb493ea8ece98ad98dd
 
 name:           haskell-http
 version:        0.1.0.0
@@ -53,6 +53,7 @@ library
     , exceptions
     , hspec
     , http-types
+    , jose
     , katip
     , lens
     , mtl
@@ -60,6 +61,7 @@ library
     , postgresql-simple-migration
     , resource-pool
     , servant
+    , servant-auth-server
     , servant-server
     , text
     , time
@@ -87,6 +89,7 @@ executable haskell-http-exe
     , haskell-http
     , hspec
     , http-types
+    , jose
     , katip
     , lens
     , mtl
@@ -94,6 +97,7 @@ executable haskell-http-exe
     , postgresql-simple-migration
     , resource-pool
     , servant
+    , servant-auth-server
     , servant-server
     , text
     , time
@@ -123,6 +127,7 @@ test-suite haskell-http-test
     , haskell-http
     , hspec
     , http-types
+    , jose
     , katip
     , lens
     , mtl
@@ -130,6 +135,7 @@ test-suite haskell-http-test
     , postgresql-simple-migration
     , resource-pool
     , servant
+    , servant-auth-server
     , servant-server
     , text
     , time
