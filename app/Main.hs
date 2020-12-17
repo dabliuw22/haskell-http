@@ -59,7 +59,7 @@ corsMiddleware =
         Just
           ( simpleCorsResourcePolicy
               { corsMethods = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"],
-                corsRequestHeaders = ["Content-Type"]
+                corsRequestHeaders = ["Authorization", "Cache-Control", "Content-Type"]
               }
           )
     )
