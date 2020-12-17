@@ -8,7 +8,6 @@ module Adapter.Http.Error
   )
 where
 
-import Control.Monad.Error (MonadError)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Aeson (ToJSON, encode)
 import Data.ByteString.Lazy (ByteString)
