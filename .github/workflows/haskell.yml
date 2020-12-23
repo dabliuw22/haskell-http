@@ -8,12 +8,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Stack
-      - uses: actions/setup-haskell@v1.1
-        with:
-          ghc-version: '8.8.3'
-          enable-stack: true
-          stack-version: 'latest'
-      - name: Run test
-        run: stack test
+    - uses: actions/checkout@v2
+    - name: Setup Stack
+      uses: actions/setup-haskell@v1.1
+      with:
+        ghc-version: '8.8.3'
+        enable-stack: true
+        stack-version: 'latest'
+    - name: Run test
+      run: stack test
