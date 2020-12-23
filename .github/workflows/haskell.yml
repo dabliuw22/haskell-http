@@ -23,8 +23,14 @@ jobs:
         cache-name: cache-stack
       with:
         path: ~/.stack
-        key: ${{ runner.os }}-${{ matrix.ghc }}-stack
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Stack Install
+      run: stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
     - name: Stack Build
-      run: stack build
-    - name: Stack test
-      run: stack test
+      run: stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
+    - name: Stack Test
+      run: stack test --system-ghc
