@@ -17,7 +17,7 @@ jobs:
         stack-version: 'latest'
     - name: Install libpq
       run: sudo apt-get install libpq-dev
-    - name: Cache
+    - name: Cache Stack
       uses: actions/cache@v1
       env:
         cache-name: cache-stack
@@ -30,5 +30,7 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-    - name: Run test
+    - name: Stack Build
+      run: stack build
+    - name: Stack test
       run: stack test
