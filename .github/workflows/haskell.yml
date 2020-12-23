@@ -17,5 +17,13 @@ jobs:
         stack-version: 'latest'
     - name: Install libpq
       run: sudo apt-get install libpq-dev
+    - name: Cache
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-stack
+      with:
+        path: |
+          ~/.stack
+          .stack-work/
     - name: Run test
       run: stack test
