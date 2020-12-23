@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup Stack
-      uses: actions/setup-haskell@v1.1
+      uses: actions/setup-haskell@v1.1.4
       with:
         ghc-version: '8.8.3'
         enable-stack: true
