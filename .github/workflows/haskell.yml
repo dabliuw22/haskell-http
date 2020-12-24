@@ -29,10 +29,6 @@ jobs:
       with:
         path: ~/.stack
         key: ${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
-    - name: 💽 Install Ormolu
-      run: stack install ormolu --resolver=lts-16.3
-    - name: 📃 Check Formatter
-      run: ormolu --mode check $(find . -name '*.hs')
     - name: 🔨 Stack Install
       run: stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
     - name: 🛠 Stack Build
