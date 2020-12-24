@@ -6,31 +6,32 @@ on:
     branches: [ master ]
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
-    - name: Setup Stack
+    - name: 🧰 Setup Stack
       uses: actions/setup-haskell@v1.1.4
       with:
         ghc-version: '8.8.3'
         enable-stack: true
         stack-version: 'latest'
-    - name: Install libpq
+    - name: 💽 Install libpq
       run: sudo apt-get install libpq-dev
-    - name: Cache Stack
+    - name: 🔑 Cache Key
+      id: cache_key
+      run: echo ::set-output name=key::$(md5sum stack.yaml | awk '{print $1}')
+    - name: 💾 Cache Dependencies
+      id: cache
       uses: actions/cache@v1
-      env:
-        cache-name: cache-stack
       with:
         path: ~/.stack
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-    - name: Stack Install
+        key: ${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
+    - name: 🔨 Stack Install
       run: stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
-    - name: Stack Build
+    - name: 🔨 Stack Build
       run: stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
-    - name: Stack Test
+    - name: 🔨 Stack Test
       run: stack test --system-ghc
