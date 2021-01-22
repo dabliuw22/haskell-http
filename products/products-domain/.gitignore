@@ -1,0 +1,16 @@
+.stack-work/
+*~
+cabal.project.local
+dist-newstyle/
+.ghc.*
+
+dist/
+.direnv
+
+out/
+
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+*.log
