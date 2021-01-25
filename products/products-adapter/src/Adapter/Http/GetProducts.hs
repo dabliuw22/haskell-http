@@ -1,0 +1,79 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
+
+module Adapter.Http.GetProducts (GetProductRoute, routes) where
+
+import Adapter.Http.Error
+  ( error404,
+    error500,
+  )
+import Application.Products ()
+import Control.Exception (try)
+import Control.Monad.IO.Class (liftIO)
+import Data.Aeson (ToJSON)
+import Data.Maybe (fromJust)
+import Data.Text (Text)
+import Data.Time (ZonedTime)
+import qualified Domain.Products as DOMAIN
+import GHC.Generics (Generic)
+import Servant
+  ( Capture,
+    Get,
+    Handler,
+    JSON,
+    Server,
+    type (:<|>) (..),
+    type (:>),
+  )
+
+type GetProductRoute =
+  ( Get '[JSON] [GetProductDto]
+      :<|> Capture "id" Text :> Get '[JSON] GetProductDto
+  ) -- or
+  {-
+  "products" :> Get '[JSON] [GetProductDto] :<|>
+  "products" :> Capture "id" Text :> Get '[JSON] GetProductDto
+  -}
+
+data GetProductDto = GetProductDto
+  { product_id :: Text,
+    product_name :: Text,
+    product_stock :: Double,
+    product_created_at :: ZonedTime
+  }
+  deriving (Generic, Show)
+
+instance ToJSON GetProductDto
+
+routes ::
+  IO [DOMAIN.Product] ->
+  (Text -> IO (Maybe DOMAIN.Product)) ->
+  Server GetProductRoute
+routes f1 f2 = allProducts f1 :<|> oneProduct f2
+
+oneProduct :: (Text -> IO (Maybe DOMAIN.Product)) -> Text -> Handler GetProductDto
+oneProduct f' id' = do
+  result <- liftIO $ f' id'
+  case result of
+    Just value -> return $ to value
+    Nothing -> error404 "Not Found Product"
+
+allProducts :: IO [DOMAIN.Product] -> Handler [GetProductDto]
+allProducts f' = do
+  result <- liftIO $ try (fmap (map to) f')
+  case result of
+    Right v -> return v
+    Left e ->
+      case e of
+        DOMAIN.ProductException _ -> error500 "Error Get All Products"
+
+to :: DOMAIN.Product -> GetProductDto
+to p =
+  GetProductDto
+    { product_id = DOMAIN.id (DOMAIN.productId p),
+      product_name = DOMAIN.name (DOMAIN.productName p),
+      product_stock = DOMAIN.stock (DOMAIN.productStock p),
+      product_created_at = DOMAIN.createdAt (DOMAIN.productCreatedAt p)
+    }
