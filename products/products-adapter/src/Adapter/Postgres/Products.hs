@@ -22,14 +22,14 @@ newtype ProductConn = ProductConn (Pool PG.Connection)
 
 instance ProductRepository ProductConn where
   findById (ProductConn pool) id' = do
-    result <- ASYNC.run $ findById' pool id'
+    result <- ASYNC.runBlock $ findById' pool id'
     case result of
       Just value -> return $ Just (to value)
       Nothing -> return Nothing
-  findAll (ProductConn pool) = ASYNC.run $ fmap (map to) (findAll' pool)
-  create (ProductConn pool) product' = ASYNC.run $ create' pool product'
-  deleteById (ProductConn pool) id' = deleteById' pool id'
-  update (ProductConn pool) id' name stock = update' pool id' name stock
+  findAll (ProductConn pool) = ASYNC.runBlock $ fmap (map to) (findAll' pool)
+  create (ProductConn pool) product' = ASYNC.runBlock $ create' pool product'
+  deleteById (ProductConn pool) id' = ASYNC.runBlock $ deleteById' pool id'
+  update (ProductConn pool) id' name stock = ASYNC.runBlock $ update' pool id' name stock
 
 {-
 {-# LANGUAGE FlexibleInstances #-}
