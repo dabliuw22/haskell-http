@@ -2,64 +2,81 @@
 
 In this project an API rest with **servant**, **postgresql-simple** was created. Using **Type-Classes** and **Tagless Final**.
 
-Requirements:
+## Requirements:
+   * Haskell Stack.
+   * Cabal.
+   * Docker.
+   * Docker Compose.
+   * libpq.
 
-   * Haskell Stack
-   * Docker
-   * Docker Compose
+## Install `libpq`
+
+### On Mac OS
+```shell
+$ brew install libpq # or brew install postgresql
+$ brew link --force libpq # export PATH="/usr/local/opt/libpq/bin:$PATH"
+```
+
+### On Linux (Debian, Ubuntu)
+```shell
+$ sudo apt-get install libpq-dev # or sudo apt-get install postgresql postgresql-contrib
+```
     
-1. Run Containers: 
-    ```
-    $ docker-compose up -d
-    ```
+## Run Containers: 
+```shell
+$ docker-compose up -d
+```
 
-2. Build: 
-    ```
-    $ stack build
-    ```
+## Build: 
+```shell
+$ stack build
+```
 
-3. Run: 
-    ```
-    $ stack exec haskell-http-exe
-    ```
+## Run: 
+```shell
+$ stack exec haskell-http-exe
+```
 
-4. Test with cURL:
+## Test with cURL:
 
-    * All Products:
-    ```
-    curl --location --request GET 'http://localhost:8080/products'
-    ```
+### All Products:
+```shell
+$ curl --location --request GET 'http://localhost:8080/products'
+```
+
+### Get Product By ID:
+```shell
+$ curl --location --request GET 'http://localhost:8080/products/{UUID}'
+``` 
+
+### Create Product:
+```shell
+$ curl --location --request POST 'http://localhost:8080/products' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "product_name": "New Product Name",
+    "product_stock": 22.0
+}'
+```
    
-    * Get Product By ID:
-    ```
-    curl --location --request GET 'http://localhost:8080/products/{UUID}'
-    ``` 
-   
-    * Create Product:
-    ```
-    curl --location --request POST 'http://localhost:8080/products' \
-    --header 'Content-Type: application/json' \
-    --data-raw '{
-        "product_name": "New Product Name",
-        "product_stock": 22.0
-    }'
-    ```
-   
-5. Test with frontend client:
-    [elm-http-client](https://github.com/dabliuw22/elm-http-client)
+## Test with frontend client:
+[elm-http-client-app](https://github.com/dabliuw22/elm-http-client-app)
  
- 
-6. Apply formatter:
-    ```
-    # With stack
-    $ stack install ormolu --resolver=lts-16.3
-    # With cabal
-    $ cabal update
-    $ cabal new-install ormolu
-    # Apply
-    $ ormolu --mode inplace $(find . -name '*.hs')
-    ```
-6. Run tests:
-    ```
-    $ stack test -- or `stack ghci haskell-http:haskell-http-test`
-    ``` 
+## Apply formatter:
+
+### With Stack
+```shell
+$ stack install ormolu --resolver=lts-16.11
+$ ormolu --mode inplace $(find . -name '*.hs')
+```
+### With Cabal
+```shell
+$ cabal update
+$ cabal new-install ormolu
+$ ormolu --mode inplace $(find . -name '*.hs')
+```
+
+## Run tests:
+```shell
+$ stack test # or `stack ghci haskell-http:haskell-http-test`
+``` 
