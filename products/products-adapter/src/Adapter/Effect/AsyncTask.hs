@@ -1,6 +1,6 @@
 module Adapter.Effect.AsyncTask (AsyncTask (..)) where
 
-import Control.Concurrent.Async (async, waitCatch, Async)
+import Control.Concurrent.Async (Async, async, waitCatch)
 import Control.Monad.Catch (MonadThrow, throwM)
 
 class (Monad m, MonadThrow m) => AsyncTask m where

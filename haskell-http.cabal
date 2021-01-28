@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5a2a250fafa3847bd6b3076566a38743f645524a23857baf082b90eae6a283a3
+-- hash: 31e843c35ea4e6f9a7a08e5b7129792ab2b1ad6b09a7de4bd2ce0ad8b58988ef
 
 name:           haskell-http
 version:        0.1.0.0
@@ -26,6 +26,8 @@ source-repository head
   location: https://github.com/dabliuw22/haskell-http
 
 library
+  exposed-modules:
+      Server.Api
   other-modules:
       Paths_haskell_http
   hs-source-dirs:
