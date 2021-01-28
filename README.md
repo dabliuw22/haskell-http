@@ -21,6 +21,11 @@ $ brew link --force libpq # export PATH="/usr/local/opt/libpq/bin:$PATH"
 ```shell
 $ sudo apt-get install libpq-dev # or sudo apt-get install postgresql postgresql-contrib
 ```
+
+### On Linux (Arch, Manjaro)
+```shell
+$ sudo pacman install postgresql-libs
+```
     
 ## Run Containers: 
 ```shell
