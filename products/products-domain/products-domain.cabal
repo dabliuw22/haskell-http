@@ -1,0 +1,30 @@
+cabal-version:  1.12
+
+name:           products-domain
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/dabliuw22/haskell-http#readme>
+homepage:       https://github.com/dabliuw22/haskell-http#readme
+bug-reports:    https://github.com/dabliuw22/haskell-http/issues
+author:         Will Leyton
+maintainer:     wleylop22@gmail.com
+copyright:      2020 Will Leyton
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    CHANGELOG.md
+
+library
+  exposed-modules:
+    Domain.Products
+    Domain.Repository
+  other-modules:
+      Paths_products_domain
+  hs-source-dirs:
+      src
+  build-depends:
+      base >= 4.5 && < 5
+    , bytestring >=0.10.10 && <0.11
+    , text >=1.2.2.1 && <1.3
+    , time >=1.9.3 && <1.10
+  default-language: Haskell2010

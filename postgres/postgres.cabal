@@ -1,0 +1,36 @@
+cabal-version:  1.12
+
+name:           postgres
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/dabliuw22/haskell-http#readme>
+homepage:       https://github.com/dabliuw22/haskell-http#readme
+bug-reports:    https://github.com/dabliuw22/haskell-http/issues
+author:         Will Leyton
+maintainer:     wleylop22@gmail.com
+copyright:      2020 Will Leyton
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    CHANGELOG.md
+
+library
+  exposed-modules:
+    Postgres.Config.PostgresConfig
+    Postgres.Migration.PostgresMigration
+    Postgres.Util.Postgres
+  other-modules:
+      Paths_postgres
+  hs-source-dirs:
+      src
+  build-depends:
+      base >= 4.5 && < 5
+    , exceptions
+    , katip >= 0.1.0.0 && < 0.8.6.0
+    , postgresql-simple
+    , postgresql-simple-migration
+    , resource-pool
+    , time >= 1.9.3 && < 1.10
+    , envs
+    , logger
+  default-language: Haskell2010
