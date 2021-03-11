@@ -13,6 +13,8 @@ dist/
 out/
 .idea_modules/
 
+.vscode/
+
 *.DS_Store
 .AppleDouble
 .LSOverride
