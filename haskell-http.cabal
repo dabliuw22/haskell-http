@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 31e843c35ea4e6f9a7a08e5b7129792ab2b1ad6b09a7de4bd2ce0ad8b58988ef
+-- hash: c5d2abafffa2584566e8bc4cad3a27d8ac29b9795b46d6943e19a398d87d1dab
 
 name:           haskell-http
 version:        0.1.0.0
@@ -42,6 +42,7 @@ library
     , directory
     , envs
     , exceptions
+    , free
     , hspec
     , http-types
     , jose
@@ -84,6 +85,7 @@ executable haskell-http-exe
     , directory
     , envs
     , exceptions
+    , free
     , haskell-http
     , hspec
     , http-types
@@ -128,6 +130,7 @@ test-suite haskell-http-test
     , directory
     , envs
     , exceptions
+    , free
     , haskell-http
     , hspec
     , http-types

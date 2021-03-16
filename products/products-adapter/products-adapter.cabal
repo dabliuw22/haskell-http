@@ -34,6 +34,7 @@ library
     , bytestring-conversion >=0.1 && <0.3.2
     , directory
     , exceptions
+    , free
     , http-types
     , jose
     , katip >=0.1.0.0 && <0.8.6.0
